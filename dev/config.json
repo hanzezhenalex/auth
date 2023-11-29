@@ -1,0 +1,7 @@
+{
+  "host":     "10.237.150.88",
+  "port":     3306,
+  "database": "alex-auth",
+  "username": "alex",
+  "password": "alex"
+}
