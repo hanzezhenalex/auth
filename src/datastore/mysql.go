@@ -36,5 +36,9 @@ func NewMysqlDatastore(cfg src.DbConfig) (*mysqlDatastore, error) {
 }
 
 func (store *mysqlDatastore) onBoarding() error {
-	return store.engine.Sync(new(User), new(Authority), new(Role))
+	return store.engine.Sync(
+		new(User),
+		new(Authority),
+		new(Role),
+	)
 }

@@ -29,9 +29,9 @@ echo "mysql container id: ${DOCKER_MYSQL_CONTAINER_ID}"
 
 # prepare db
 echo "create database ${MYSQL_DEFAULT_DATABASE}"
-docker exec "${MYSQL_DEFAULT_DATABASE}" mysql -u"${MYSQL_ROOT_USER}" -p"${MYSQL_ROOT_PASSWORD}" \
+docker exec "${DOCKER_MYSQL_CONTAINER_ID}" mysql -u"${MYSQL_ROOT_USER}" -p"${MYSQL_ROOT_PASSWORD}" \
  -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DEFAULT_DATABASE};"
 
 echo "grant full privilege for ${MYSQL_USER} on wechat"
-docker exec "${MYSQL_DEFAULT_DATABASE}" mysql -u"${MYSQL_ROOT_USER}" -p"${MYSQL_ROOT_PASSWORD}" \
-  -e "GRANT ALL PRIVILEGES ON ${MYSQL_DEFAULT_DATABASE}.* TO '${MYSQL_BUSINESS_USER}'@'%';"
+docker exec "${DOCKER_MYSQL_CONTAINER_ID}" mysql -u"${MYSQL_ROOT_USER}" -p"${MYSQL_ROOT_PASSWORD}" \
+  -e "GRANT ALL PRIVILEGES ON "\`${MYSQL_DEFAULT_DATABASE}\`".* TO '${MYSQL_BUSINESS_USER}'@'%';"
