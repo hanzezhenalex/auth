@@ -9,12 +9,12 @@ import (
 )
 
 type User struct {
-	ID        int64     `xorm:"id pk autoincr"`
-	Username  string    `xorm:"user_name not null unique(is_delete)"`
-	Password  string    `xorm:"password not null"`
-	Reserve   string    `xorm:"reserve"`
+	ID        int64     `xorm:"'id' pk autoincr"`
+	Username  string    `xorm:"'user_name' not null unique(is_delete)"`
+	Password  string    `xorm:"'password' not null"`
+	Reserve   string    `xorm:"'reserve'"`
 	CreatedAt time.Time `xorm:"created"`
-	DeletedAt int64     `xorm:"deleted unique(is_delete) default(0)"`
+	DeletedAt int64     `xorm:"'deleted_at' unique(is_delete) default(0)"`
 }
 
 func (user User) TableName() string {
@@ -44,12 +44,12 @@ func (s *Scopes) UnmarshalJSON(data []byte) error {
 }
 
 type Role struct {
-	ID        int64     `xorm:"id pk autoincr"`
-	RoleName  string    `xorm:"role_name unique(is_delete)"`
-	CreatedBy string    `xorm:"created_by"`
-	Scopes    Scopes    `xorm:"scopes"`
+	ID        int64     `xorm:"'id' pk autoincr"`
+	RoleName  string    `xorm:"'role_name' unique(is_delete)"`
+	CreatedBy string    `xorm:"'created_by'"`
+	Scopes    Scopes    `xorm:"'scopes'"`
 	CreatedAt time.Time `xorm:"created"`
-	DeletedAt int64     `xorm:"deleted unique(is_delete) default(0)"`
+	DeletedAt int64     `xorm:"'deleted_at' unique(is_delete) default(0)"`
 }
 
 func (role Role) TableName() string {
@@ -57,11 +57,11 @@ func (role Role) TableName() string {
 }
 
 type Authority struct {
-	ID        int64     `xorm:"id pk autoincr"`
-	AuthName  string    `xorm:"authority_name not null unique(is_delete)"`
-	CreatedBy string    `xorm:"created_by"`
+	ID        int64     `xorm:"'id' pk autoincr"`
+	AuthName  string    `xorm:"'authority_name' not null unique(is_delete)"`
+	CreatedBy string    `xorm:"'created_by'"`
 	CreatedAt time.Time `xorm:"created"`
-	DeletedAt int64     `xorm:"deleted_at unique(is_delete) default(0)"`
+	DeletedAt int64     `xorm:"'deleted_at' unique(is_delete) default(0)"`
 }
 
 func (auth Authority) TableName() string {

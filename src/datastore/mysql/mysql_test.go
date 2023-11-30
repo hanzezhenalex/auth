@@ -21,8 +21,11 @@ func createMysqlDatastore() *mysqlDatastore {
 		panic(err)
 	}
 
-	store, err := NewMysqlDatastore(cfg.DbConfig, true)
+	store, err := NewMysqlDatastore(cfg.DbConfig)
 	if err != nil {
+		panic(err)
+	}
+	if err := store.cleanup(); err != nil {
 		panic(err)
 	}
 	return store
@@ -77,5 +80,26 @@ func TestMysqlDatastore_Authority(t *testing.T) {
 		// create and delete second time
 		rq.NoError(store.CreateAuthority(ctx, auth))
 		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID))
+	})
+
+	t.Run("get", func(t *testing.T) {
+		const name = "test_5"
+		expected := &datastore.Authority{AuthName: name}
+
+		rq.NoError(store.CreateAuthority(ctx, expected))
+
+		actual, err := store.GetAuthorityByID(ctx, expected.ID)
+
+		rq.NoError(err)
+		rq.Equal(expected.ID, actual.ID)
+		rq.Equal(expected.AuthName, actual.AuthName)
+		rq.Equal(expected.CreatedAt.Unix(), actual.CreatedAt.Unix())
+	})
+
+	t.Run("get a non-existed one, should fail", func(t *testing.T) {
+		actual, err := store.GetAuthorityByID(ctx, 9999)
+
+		rq.Nil(actual)
+		rq.Equal(datastore.ErrorAuthNotExist, err)
 	})
 }

@@ -8,6 +8,7 @@ import (
 type Datastore interface {
 	CreateAuthority(ctx context.Context, auth *Authority) error
 	DeleteAuthorityByID(ctx context.Context, id int64) error
+	GetAuthorityByID(ctx context.Context, id int64) (*Authority, error)
 }
 
 var (
