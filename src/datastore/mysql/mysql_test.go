@@ -61,11 +61,11 @@ func TestMysqlDatastore_Authority(t *testing.T) {
 		auth := &datastore.Authority{AuthName: name}
 
 		rq.NoError(store.CreateAuthority(ctx, auth))
-		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID))
+		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID, false))
 	})
 
 	t.Run("delete a non-existed one, should fail", func(t *testing.T) {
-		rq.Equal(datastore.ErrorAuthNotExist, store.DeleteAuthorityByID(ctx, 9999))
+		rq.Equal(datastore.ErrorAuthNotExist, store.DeleteAuthorityByID(ctx, 9999, false))
 	})
 
 	t.Run("read", func(t *testing.T) {
@@ -94,7 +94,7 @@ func TestMysqlDatastore_Authority(t *testing.T) {
 		expected := &datastore.Authority{AuthName: name}
 
 		rq.NoError(store.CreateAuthority(ctx, expected))
-		rq.NoError(store.DeleteAuthorityByID(ctx, expected.ID))
+		rq.NoError(store.DeleteAuthorityByID(ctx, expected.ID, false))
 
 		actual, err := store.GetAuthorityByID(ctx, expected.ID)
 
@@ -108,7 +108,7 @@ func TestMysqlDatastore_Authority(t *testing.T) {
 
 		// create and delete first time
 		rq.NoError(store.CreateAuthority(ctx, auth))
-		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID))
+		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID, false))
 
 		// clean up
 		auth.ID = 0
@@ -116,9 +116,29 @@ func TestMysqlDatastore_Authority(t *testing.T) {
 
 		// create and delete second time
 		rq.NoError(store.CreateAuthority(ctx, auth))
-		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID))
+		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID, false))
 	})
 
+	t.Run("delete an auth with role binding", func(t *testing.T) {
+		const authName = "test_auth_delete_an_auth_with_role_binding"
+		expected := &datastore.Authority{AuthName: authName}
+
+		rq.NoError(store.CreateAuthority(ctx, expected))
+
+		role := datastore.Role{
+			RoleName: "test_auth_delete_an_auth_with_role_binding_role",
+			Scopes:   []string{"scope1", "scope2"},
+			Auths:    []string{authName},
+		}
+		rq.NoError(store.CreateRole(ctx, &role))
+
+		rq.Equal(
+			datastore.ErrorDeleteAuthWithBinding,
+			store.DeleteAuthorityByID(ctx, expected.ID, false),
+		)
+
+		rq.NoError(store.DeleteAuthorityByID(ctx, expected.ID, true))
+	})
 }
 
 func TestMysqlDatastore_Role(t *testing.T) {
@@ -209,7 +229,7 @@ func TestMysqlDatastore_Role(t *testing.T) {
 
 		rq.NoError(store.CreateRole(ctx, role))
 
-		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID))
+		rq.NoError(store.DeleteAuthorityByID(ctx, auth.ID, true))
 
 		actual, err := store.GetRoleByID(ctx, role.ID)
 		rq.NoError(err)
