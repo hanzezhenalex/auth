@@ -37,6 +37,7 @@ type join struct {
 	joinType  string
 	joinTable interface{}
 	joinCond  Cond
+	alias     string
 }
 
 type setOp struct {
