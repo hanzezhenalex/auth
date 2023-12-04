@@ -7,7 +7,7 @@ import (
 
 type Datastore interface {
 	CreateAuthority(ctx context.Context, auth *Authority) error
-	DeleteAuthorityByID(ctx context.Context, id int64) error
+	DeleteAuthorityByID(ctx context.Context, id int64, force bool) error
 	GetAuthorityByID(ctx context.Context, id int64) (*Authority, error)
 
 	CreateRole(ctx context.Context, role *Role) error
@@ -22,8 +22,9 @@ type UpdateRoleScopeOption struct {
 }
 
 var (
-	ErrorAuthExist    = errors.New("authority exist")
-	ErrorAuthNotExist = errors.New("authority not exist")
+	ErrorAuthExist             = errors.New("authority exist")
+	ErrorAuthNotExist          = errors.New("authority not exist")
+	ErrorDeleteAuthWithBinding = errors.New("delete an auth with bindings")
 
 	ErrorRoleExist    = errors.New("role exist")
 	ErrorRoleNotExist = errors.New("role not exist")

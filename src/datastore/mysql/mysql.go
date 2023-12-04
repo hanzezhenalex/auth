@@ -3,10 +3,12 @@ package mysql
 import (
 	"context"
 	"fmt"
-	"github.com/go-sql-driver/mysql"
-	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/hanzezhenalex/auth/src"
 	"github.com/hanzezhenalex/auth/src/datastore"
+
+	"github.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"xorm.io/xorm"
 )
 
@@ -113,19 +115,34 @@ func (store *mysqlDatastore) CreateAuthority(ctx context.Context, auth *datastor
 }
 
 // DeleteAuthorityByID soft delete
-func (store *mysqlDatastore) DeleteAuthorityByID(ctx context.Context, id int64) error {
-	n, err := store.engine.Context(ctx).
-		Table(new(datastore.Authority)).
-		Where("id=?", id).
-		Delete()
+func (store *mysqlDatastore) DeleteAuthorityByID(ctx context.Context, id int64, force bool) error {
+	return store.transaction(ctx, func(session *xorm.Session) error {
+		if !force {
+			cnt, err := session.
+				Where("auth_id=?", id).
+				Count(new(datastore.RoleBinding))
+			if err != nil {
+				return fmt.Errorf("fail to count role bindings, %w", err)
+			}
+			if cnt != 0 {
+				return datastore.ErrorDeleteAuthWithBinding
+			}
+		}
 
-	if err != nil {
-		return err
-	} else if n == 0 {
-		return datastore.ErrorAuthNotExist
-	} else {
-		return nil
-	}
+		n, err := session.
+			Table(new(datastore.Authority)).
+			Where("id=?", id).
+			Delete()
+
+		if err != nil {
+			return err
+		} else if n == 0 {
+			return datastore.ErrorAuthNotExist
+		} else {
+			return nil
+		}
+	})
+
 }
 
 func (store *mysqlDatastore) GetAuthorityByID(ctx context.Context, id int64) (*datastore.Authority, error) {
