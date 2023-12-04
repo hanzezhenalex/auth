@@ -88,7 +88,7 @@ func (b *Builder) selectWriteTo(w Writer) error {
 			if err := b.WriteTo(w); err != nil {
 				return err
 			}
-			if _, err := fmt.Fprintf(w, ") ON "); err != nil {
+			if _, err := fmt.Fprintf(w, fmt.Sprintf(") %s ON ", v.alias)); err != nil {
 				return err
 			}
 		} else {
